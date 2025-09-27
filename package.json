@@ -21,7 +21,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "homepage": "https://github.com/Shyamalb4u/unidex.git",
+  "homepage": "https://Shyamalb4u.github.io/unidex",
   "eslintConfig": {
     "extends": [
       "react-app",
