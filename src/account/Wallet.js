@@ -1,0 +1,116 @@
+import { Link } from "react-router-dom";
+import HomeComponent from "../components/HomeComponent";
+import Subscription from "../components/Subscription";
+import { useState } from "react";
+import Income from "../components/Income";
+import Network from "../components/Network";
+
+export default function Wallet() {
+  const [page, setPage] = useState(0);
+  return (
+    <div className="container bg-n900 relative overflow-hidden flex justify-start items-start text-white pb-36">
+      <div className="w-[582px] h-[582px] rounded-full bg-g300/10 absolute -top-48 -left-20 blur-[575px]"></div>
+      <div className="relative z-20 w-full">
+        <div className="bg-white bg-opacity-5 py-4 px-6 rounded-b-3xl">
+          <div className="flex justify-between items-center">
+            <div className="flex justify-start items-center gap-2">
+              <img src="/logo.png" alt="Logo" width={80} />
+              {/* <p className="text-sm">0x21hf12h1ffghfgfghfh</p> */}
+            </div>
+            <div class="flex justify-start items-center gap-2">
+              <button className="block bg-g300 font-semibold text-center py-3 px-3 rounded-lg">
+                Connect Wallet
+              </button>
+            </div>
+          </div>
+          <div className="py-4">
+            <p className="text-n70 text-sm">Your available balance</p>
+            <div className="flex justify-start items-center gap-2">
+              <img src="/assets/images/tet.png" alt="" />
+              <p className="text-[32px] font-bold text-white relative">
+                0.1802
+                <span className="text-sm font-normal text-g300 absolute top-1 -right-14">
+                  (USDT)
+                </span>
+              </p>
+            </div>
+            <p className="text-sm text-n70">
+              <span className="text-g300"></span>00 (BNB)
+            </p>
+          </div>
+        </div>
+        {page === 0 ? (
+          <HomeComponent />
+        ) : page === 1 ? (
+          <Subscription />
+        ) : page === 2 ? (
+          <Income />
+        ) : page === 3 ? (
+          <Network />
+        ) : (
+          ""
+        )}
+
+        <div className="fixed left-0 right-0 bottom-0">
+          <div className="container relative bg-white bg-opacity-5 py-5 flex justify-around items-center after:absolute after:bg-n700 after:inset-0">
+            <div className="absolute left-[41%] bottom-[72px] z-40">
+              <Link
+                to="/wallet"
+                className="bg-g300 text-2xl p-3.5 rounded-full flex justify-center items-center relative"
+              >
+                <i className="ph ph-arrows-counter-clockwise"></i>
+                <div className="absolute -bottom-2 -left-5 -right-5 -z-10">
+                  <img src="assets/images/reload-bg.png" alt="" />
+                </div>
+              </Link>
+            </div>
+            <div
+              className="flex flex-col justify-center items-center gap-1 relative z-20"
+              onClick={() => setPage(0)}
+            >
+              <i
+                className={`ph ph-house text-2xl ${
+                  page === 0 ? "text-g300" : ""
+                }`}
+              ></i>
+              <p className="text-xs font-semibold">Home</p>
+            </div>
+            <div
+              className="flex flex-col justify-center items-center gap-1 z-20"
+              onClick={() => setPage(1)}
+            >
+              <i
+                className={`ph ph-globe text-2xl ${
+                  page === 1 ? "text-g300" : ""
+                }`}
+              ></i>
+              <p className="text-xs font-semibold">Subscription</p>
+            </div>
+            <div
+              className="flex flex-col justify-center items-center gap-1 z-20"
+              onClick={() => setPage(2)}
+            >
+              <i
+                className={`ph ph-align-bottom text-2xl ${
+                  page === 2 ? "text-g300" : ""
+                }`}
+              ></i>
+              <p className="text-xs font-semibold">Income</p>
+            </div>
+            <div
+              className="flex flex-col justify-center items-center gap-1 z-20"
+              onClick={() => setPage(3)}
+            >
+              <i
+                className={`ph ph-user text-2xl ${
+                  page === 3 ? "text-g300" : ""
+                }`}
+              ></i>
+              <p className="text-xs font-semibold">Network</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
