@@ -21,7 +21,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "homepage": "https://tradebuddy.biz",
+  "homepage": "https://github.com/Shyamalb4u/unidex.git",
   "eslintConfig": {
     "extends": [
       "react-app",
