@@ -15,7 +15,7 @@ export default function Home() {
         <div className="">
           <div className="w-full bg-g300 p-5 flex justify-between items-center rounded-xl relative bg-opacity-20 overflow-hidden">
             <img
-              src="/assets/images/invite_bg.png"
+              src="assets/images/invite_bg.png"
               alt=""
               className="absolute top-0 right-0 bottom-0 h-full"
             />
@@ -29,7 +29,7 @@ export default function Home() {
               </p>
             </div>
             <div className="">
-              <img src="/globe.gif" alt="" />
+              <img src="globe.gif" alt="" />
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 gap-4 pt-5">
           <div className="rounded-xl overflow-hidden col-span-1">
-            <img src="/assets/images/nft-tab-img-1.png" alt="" />
+            <img src="assets/images/nft-tab-img-1.png" alt="" />
             <div className="bg-white bg-opacity-5 p-3 flex justify-between items-start">
               <div className="flex justify-start items-start flex-col gap-2">
                 <p className="text-sm font-semibold">
@@ -81,7 +81,7 @@ export default function Home() {
             </div>
           </div>
           <div className="rounded-xl overflow-hidden col-span-1">
-            <img src="/assets/images/nft-tab-img-2.png" alt="" />
+            <img src="assets/images/nft-tab-img-2.png" alt="" />
             <div className="bg-white bg-opacity-5 p-3 flex justify-between items-start">
               <div className="flex justify-start items-start flex-col gap-2">
                 <p className="text-sm font-semibold">
