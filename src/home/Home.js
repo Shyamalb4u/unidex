@@ -15,7 +15,7 @@ export default function Home() {
         <div className="">
           <div className="w-full bg-g300 p-5 flex justify-between items-center rounded-xl relative bg-opacity-20 overflow-hidden">
             <img
-              src="assets/images/invite_bg.png"
+              src="/assets/images/invite_bg.png"
               alt=""
               className="absolute top-0 right-0 bottom-0 h-full"
             />
