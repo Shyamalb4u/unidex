@@ -1,12 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HomeComponent from "../components/HomeComponent";
 import Subscription from "../components/Subscription";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Income from "../components/Income";
 import Network from "../components/Network";
+import useWalletStore from "../hooks/useWallet";
 
 export default function Wallet() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
+  const {
+    address,
+    isConnected,
+    signer,
+    bnbBalance,
+    usdtBalance,
+    fetchBalances,
+  } = useWalletStore();
+  useEffect(() => {
+    async function checkUser() {
+      if (!isConnected) {
+        console.log("I am here :", address);
+        navigate("/");
+      }
+    }
+    checkUser();
+  }, [isConnected, navigate]);
   return (
     <div className="container bg-n900 relative overflow-hidden flex justify-start items-start text-white pb-36">
       <div className="w-[582px] h-[582px] rounded-full bg-g300/10 absolute -top-48 -left-20 blur-[575px]"></div>
@@ -17,10 +36,10 @@ export default function Wallet() {
               <img src="/logo.png" alt="Logo" width={80} />
               {/* <p className="text-sm">0x21hf12h1ffghfgfghfh</p> */}
             </div>
-            <div class="flex justify-start items-center gap-2">
-              <button className="block bg-g300 font-semibold text-center py-3 px-3 rounded-lg">
-                Connect Wallet
-              </button>
+            <div className="flex justify-start items-center gap-2">
+              <span className="text-n70 text-sm">
+                {String(address).slice(0, 10)}......{String(address).slice(-10)}
+              </span>
             </div>
           </div>
           <div className="py-4">
@@ -28,14 +47,15 @@ export default function Wallet() {
             <div className="flex justify-start items-center gap-2">
               <img src="/assets/images/tet.png" alt="" />
               <p className="text-[32px] font-bold text-white relative">
-                0.1802
+                {usdtBalance}
                 <span className="text-sm font-normal text-g300 absolute top-1 -right-14">
                   (USDT)
                 </span>
               </p>
             </div>
             <p className="text-sm text-n70">
-              <span className="text-g300"></span>00 (BNB)
+              <span className="text-g300"></span>
+              {bnbBalance} (BNB)
             </p>
           </div>
         </div>

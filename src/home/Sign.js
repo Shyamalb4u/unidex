@@ -1,89 +1,253 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useWallet, sendUSDT } from "../hooks/useWallet";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import useWalletStore from "../hooks/useWallet";
+import FlashMessage from "../components/FlashMessage";
 
 export default function Sign() {
+  const navigate = useNavigate();
+  const api_link = "http://localhost:8080/api/";
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const spn = searchParams.get("s");
   const [refer, setRefer] = useState("");
-  const { connectWallet, address, isConnected, signer } = useWallet();
+  const [showRegi, setShowRegi] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const { connectWallet, address, isConnected, signer } = useWalletStore();
+
+  const [flash, setFlash] = useState("");
+
+  // const showMessage = () => {
+  //   setFlash("Wallet connected successfully!");
+  // };
+
   useEffect(() => {
     setRefer(spn);
   }, [spn]);
-  return (
-    <div className="container bg-n900 h-dvh relative overflow-hidden flex justify-start items-start text-white min-h-dvh">
-      <div className="w-[582px] h-[582px] rounded-full bg-g300 absolute -top-32 -left-20 blur-[575px]"></div>
+  useEffect(() => {
+    async function checkUser() {
+      if (isConnected) {
+        try {
+          let url = api_link + "getUser/" + address;
+          const result = await fetch(url);
+          const reData = await result.json();
 
-      <div className="px-6 py-8 relative z-20">
-        <div className="flex justify-start items-center gap-20">
-          <Link
-            to="/"
-            className="flex justify-center items-center p-2 rounded-full bg-g300 text-n900"
-          >
-            <i className="ph-bold ph-caret-left"></i>
-          </Link>
-          <button onClick={connectWallet}>
-            {isConnected ? `Connected: ${address}` : "Connect Wallet"}
-          </button>
-          {/* <div className="flex justify-start items-center">
+          if (reData.data !== "No Data") {
+            navigate("/wallet");
+          } else {
+            setShowRegi(true);
+            console.log("Not a user");
+          }
+        } catch (e) {
+          setShowRegi(true);
+          return;
+        }
+      } else {
+        setShowRegi(false);
+      }
+    }
+    checkUser();
+  }, [address]);
+
+  async function onSignup() {
+    if (!address) {
+      setFlash("Please Connect Wallet");
+      return;
+    }
+    if (!refer) {
+      setFlash("Please come back here by a refer link");
+      return;
+    }
+    // # Check sponsor
+    // 1. Check balance
+    // 2. Transfer USDT and get txn
+    // 3. Then insert to database
+    const signUpurl = api_link + "signup";
+    const data = {
+      spn: refer,
+      public: address,
+      amt: amount,
+      txn: "txn",
+    };
+    const customHeaders = {
+      "Content-Type": "application/json",
+    };
+    try {
+      const result = await fetch(signUpurl, {
+        method: "POST",
+        headers: customHeaders,
+        body: JSON.stringify(data),
+      });
+
+      if (!result.ok) {
+        throw new Error(`HTTP error! status: ${result.status}`);
+      }
+      const reData = await result.json();
+      const uid = reData.data[0].uid;
+      if (uid !== "Sponsor Not Exists") {
+        navigate("/wallet");
+      } else {
+        console.log("Sponsor Not Exists");
+      }
+      //console.log(reData);
+    } catch (error) {
+      console.log("Others Error!");
+    }
+  }
+  return (
+    <>
+      <div className="container bg-n900 h-dvh relative overflow-hidden flex justify-start items-start text-white min-h-dvh">
+        <div className="w-[582px] h-[582px] rounded-full bg-g300 absolute -top-32 -left-20 blur-[575px]"></div>
+
+        <div className="px-6 py-8 relative z-20">
+          <div className="flex justify-start items-center gap-20">
+            <Link
+              to="/"
+              className="flex justify-center items-center p-2 rounded-full bg-g300 text-n900"
+            >
+              <i className="ph-bold ph-caret-left"></i>
+            </Link>
+            {isConnected ? (
+              <span className="text-n70 text-sm">
+                {String(address).slice(0, 10)}......{String(address).slice(-10)}
+              </span>
+            ) : (
+              <button
+                className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </button>
+            )}
+
+            {/* <div className="flex justify-start items-center">
             <button className="block bg-g300 font-semibold text-center py-3 px-3 rounded-lg">
               Connect Wallet
             </button>
           </div> */}
-        </div>
+          </div>
 
-        <div className="flex justify-center items-center flex-col gap-3 text- pt-8">
-          <h1 className="text-2xl font-semibold">Registation / Signin</h1>
-          <p className="text-n70 text-sm text-center"></p>
-        </div>
+          <div className="flex justify-center items-center flex-col gap-3 text- pt-8">
+            <h1 className="text-2xl font-semibold">Registation / Signin</h1>
+            <p className="text-n70 text-sm text-center"></p>
+          </div>
 
-        <div className="border border-white border-opacity-5 border-dashed w-full mt-8"></div>
+          <div className="border border-white border-opacity-5 border-dashed w-full mt-8"></div>
+          {showRegi ? (
+            <div>
+              <div className="mt-6 p-4 bg-white bg-opacity-5 rounded-xl flex flex-col justify-center items-center text-center">
+                <p className="text-n70 text-sm pt-3">Sponsor</p>
+                <ul className="flex justify-center items-center gap-3 flex-wrap pt-4">
+                  <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
+                    <span className="font-medium">{refer}</span>
+                  </li>
+                  <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md"></li>
+                </ul>
+              </div>
 
-        <div className="mt-6 p-4 bg-white bg-opacity-5 rounded-xl flex flex-col justify-center items-center text-center">
-          <p className="text-n70 text-sm pt-3">Sponsor</p>
-          <ul className="flex justify-center items-center gap-3 flex-wrap pt-4">
-            <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-              <span className="font-medium">{refer}</span>
-            </li>
-            <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md"></li>
-          </ul>
-        </div>
+              <ul className="flex flex-wrap gap-3 pt-4">
+                <li
+                  className={`${
+                    amount === 1
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(1);
+                    setFlash("You have selected $1");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">1</span>
+                </li>
+                <li
+                  className={`${
+                    amount === 10
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(10);
+                    setFlash("You have selected $10");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">10</span>
+                </li>
+                <li
+                  className={`${
+                    amount === 25
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(25);
+                    setFlash("You have selected $25");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">25</span>
+                </li>
 
-        <ul className="flex flex-wrap gap-3 pt-4">
-          <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-            <span className="text-n70">$</span>
-            <span className="font-medium">10</span>
-          </li>
-          <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-            <span className="text-n70">$</span>
-            <span className="font-medium">25</span>
-          </li>
+                <li
+                  className={`${
+                    amount === 50
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(50);
+                    setFlash("You have selected $50");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">50</span>
+                </li>
 
-          <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-            <span className="text-n70">$</span>
-            <span className="font-medium">50</span>
-          </li>
+                <li
+                  className={`${
+                    amount === 100
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(100);
+                    setFlash("You have selected $100");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">100</span>
+                </li>
+                <li
+                  className={`${
+                    amount === 250
+                      ? "bg-g300 bg-opacity-4"
+                      : "bg-white bg-opacity-5"
+                  } py-2 px-4 rounded-md`}
+                  onClick={() => {
+                    setAmount(250);
+                    setFlash("You have selected $250");
+                  }}
+                >
+                  <span className="text-n70">$</span>
+                  <span className="font-medium">250</span>
+                </li>
+              </ul>
 
-          <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-            <span className="text-n70">$</span>
-            <span className="font-medium">100</span>
-          </li>
-          <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-            <span className="text-n70">$</span>
-            <span className="font-medium">250</span>
-          </li>
-        </ul>
-
-        <div className="w-full pt-20">
-          <Link
-            to="/wallet"
-            className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
-          >
-            Create Account
-          </Link>
+              <div className="w-full pt-20">
+                <button
+                  className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                  onClick={() => onSignup()}
+                >
+                  Create Account
+                </button>
+              </div>
+            </div>
+          ) : (
+            <img src="/connect.png" alt="Connect" onClick={connectWallet} />
+          )}
         </div>
       </div>
-    </div>
+      <FlashMessage message={flash} onClose={() => setFlash("")} />
+    </>
   );
 }
