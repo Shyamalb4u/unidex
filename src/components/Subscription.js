@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FlashMessage from "./FlashMessage";
+import useWalletStore from "../hooks/useWallet";
 
 export default function Subscription() {
   const api_link = process.env.REACT_APP_API_URL;
