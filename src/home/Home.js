@@ -50,12 +50,12 @@ export default function Home() {
           with a structured network model.
         </p>
         <div className="bg-white bg-opacity-5 rounded-xl p-3 mt-4">
-          <div class="flex justify-between items-center gap-6 pt-3">
-            <div class="">
-              <p class="font-semibold">
+          <div className="flex justify-between items-center gap-6 pt-3">
+            <div className="">
+              <p className="font-semibold">
                 Maximize your earnings through smart investments.
               </p>
-              <p class="font-medium text-n70">
+              <p className="font-medium text-n70">
                 Boost your earning potential with strategic asset investments
                 and a blockchain-driven ecosystem, tailored for sustainable
                 growth and effortless gain and scalable earning opportunities.

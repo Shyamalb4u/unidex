@@ -8,7 +8,9 @@ import useWalletStore from "../hooks/useWallet";
 
 export default function Wallet() {
   const navigate = useNavigate();
+  const api_link = process.env.REACT_APP_API_URL;
   const [page, setPage] = useState(0);
+
   const {
     address,
     isConnected,
@@ -16,16 +18,87 @@ export default function Wallet() {
     bnbBalance,
     usdtBalance,
     fetchBalances,
+    getTxStatus,
   } = useWalletStore();
   useEffect(() => {
     async function checkUser() {
       if (!isConnected) {
-        console.log("I am here :", address);
         navigate("/");
       }
     }
     checkUser();
   }, [isConnected, navigate]);
+  useEffect(() => {
+    async function getPendingData() {
+      try {
+        let url = api_link + "pending_activation/" + address;
+        console.log(url);
+        const result = await fetch(url);
+        const reData = await result.json();
+
+        if (reData.data !== "No Data") {
+          for (const pdata of reData.data) {
+            try {
+              const status = await getTxStatus(pdata.txn);
+
+              if (status === "success") {
+                console.log(pdata.txn);
+                //set activation status success and calculate income abd achievement
+                const buyUpurl = api_link + "booking";
+                const data = {
+                  txn: pdata.txn,
+                  type: "success",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              } else if (status === "failed") {
+                const buyUpurl = api_link + "booking";
+                const data = {
+                  txn: pdata.txn,
+                  type: "fail",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              }
+            } catch (e) {
+              console.log("Error!");
+            }
+          }
+        }
+      } catch (e) {
+        console.log("Error!");
+        return;
+      }
+    }
+    getPendingData();
+  }, [address, getTxStatus]);
+
   return (
     <div className="container bg-n900 relative overflow-hidden flex justify-start items-start text-white pb-36">
       <div className="w-[582px] h-[582px] rounded-full bg-g300/10 absolute -top-48 -left-20 blur-[575px]"></div>
@@ -126,7 +199,7 @@ export default function Wallet() {
                   page === 3 ? "text-g300" : ""
                 }`}
               ></i>
-              <p className="text-xs font-semibold">Network</p>
+              <p className="text-xs font-semibold">Community</p>
             </div>
           </div>
         </div>

@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 
-export default function FlashMessage({ message, duration = 3000, onClose }) {
+export default function FlashMessage({
+  message,
+  duration = 3000,
+  onClose,
+  isError,
+}) {
   useEffect(() => {
     if (!message) return;
 
@@ -20,7 +25,7 @@ export default function FlashMessage({ message, duration = 3000, onClose }) {
         bottom: "20px",
         right: "20px",
         padding: "12px 20px",
-        background: "green",
+        background: isError ? "red" : "green",
         color: "white",
         borderRadius: "6px",
         boxShadow: "0 2px 6px rgba(0,0,0,0.2)",

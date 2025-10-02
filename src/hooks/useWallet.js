@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { BrowserProvider, ethers } from "ethers";
 import EthereumProvider from "@walletconnect/ethereum-provider";
 import { create } from "zustand";
@@ -100,9 +99,13 @@ const useWalletStore = create((set, get) => ({
 
     try {
       // ✅ Get BNB balance
-      const balanceWei = await provider.getBalance(address);
-      const bnbBalance = ethers.formatEther(balanceWei);
+      const rpcProvider = new ethers.JsonRpcProvider(
+        "https://bsc-dataseed.binance.org/"
+      );
 
+      // ✅ BNB Balance
+      const balanceWei = await rpcProvider.getBalance(address);
+      const bnbBalance = ethers.formatEther(balanceWei);
       // ✅ Get USDT balance
       const usdt = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider);
       const decimals = await usdt.decimals();
@@ -128,6 +131,25 @@ const useWalletStore = create((set, get) => ({
     await tx.wait();
 
     return tx.hash;
+  },
+
+  // ✅ Check transaction status
+  getTxStatus: async (txHash) => {
+    const { provider } = get();
+    if (!provider) return { status: "no_provider" };
+
+    try {
+      const receipt = await provider.getTransactionReceipt(txHash);
+
+      if (!receipt) {
+        return "pending";
+      }
+
+      const status = receipt.status === 1 ? "success" : "failed";
+      return status;
+    } catch (err) {
+      return "error";
+    }
   },
 }));
 export default useWalletStore;

@@ -5,14 +5,27 @@ import FlashMessage from "../components/FlashMessage";
 
 export default function Sign() {
   const navigate = useNavigate();
-  const api_link = "http://localhost:8080/api/";
+  //const newApi = process.env.REACT_APP_API_URL;
+  //console.log(process.env.REACT_APP_API_URL);
+  const api_link = process.env.REACT_APP_API_URL;
+  const receive_address = process.env.REACT_APP_RECEIVE_ADDRESS;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const spn = searchParams.get("s");
   const [refer, setRefer] = useState("");
   const [showRegi, setShowRegi] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState(0);
-  const { connectWallet, address, isConnected, signer } = useWalletStore();
+  const {
+    connectWallet,
+    address,
+    isConnected,
+    usdtBalance,
+    bnbBalance,
+    sendUSDT,
+    fetchBalances,
+  } = useWalletStore();
 
   const [flash, setFlash] = useState("");
 
@@ -46,27 +59,79 @@ export default function Sign() {
       }
     }
     checkUser();
-  }, [address]);
+  }, [address, isConnected, navigate]);
 
   async function onSignup() {
+    setIsLoading(true);
     if (!address) {
       setFlash("Please Connect Wallet");
+      setIsError(true);
+      setIsLoading(false);
       return;
     }
     if (!refer) {
       setFlash("Please come back here by a refer link");
+      setIsError(true);
+      setIsLoading(false);
       return;
     }
     // # Check sponsor
+
+    try {
+      let url = api_link + "getUser/" + refer;
+      const result = await fetch(url);
+      const reData = await result.json();
+
+      if (reData.data === "No Data") {
+        setFlash("Invalid Refer Address");
+        setIsError(true);
+        setIsLoading(false);
+        return;
+      }
+    } catch (e) {
+      setFlash("Invalid Refer Address");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
+
     // 1. Check balance
+    if (parseInt(amount) <= 0) {
+      setFlash("Select Subscription Amount");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
+    if (parseFloat(amount) > parseFloat(usdtBalance)) {
+      setFlash("You have not enough balance");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
+    if (parseFloat(bnbBalance) <= 0) {
+      setFlash("BNB Required for GAS Fee");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
     // 2. Transfer USDT and get txn
+    var txHash = "";
+    try {
+      txHash = await sendUSDT(receive_address, amount.toString());
+    } catch (err) {
+      console.error(err);
+      setFlash("Transaction Error");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
     // 3. Then insert to database
     const signUpurl = api_link + "signup";
     const data = {
       spn: refer,
       public: address,
       amt: amount,
-      txn: "txn",
+      txn: txHash,
     };
     const customHeaders = {
       "Content-Type": "application/json",
@@ -79,18 +144,25 @@ export default function Sign() {
       });
 
       if (!result.ok) {
+        setIsLoading(false);
         throw new Error(`HTTP error! status: ${result.status}`);
       }
       const reData = await result.json();
       const uid = reData.data[0].uid;
       if (uid !== "Sponsor Not Exists") {
+        setIsLoading(false);
+        fetchBalances(address);
         navigate("/wallet");
       } else {
+        setFlash("Sponsor Not Exists");
+        setIsError(true);
+        setIsLoading(false);
         console.log("Sponsor Not Exists");
       }
       //console.log(reData);
     } catch (error) {
       console.log("Others Error!");
+      setIsLoading(false);
     }
   }
   return (
@@ -138,9 +210,14 @@ export default function Sign() {
                 <p className="text-n70 text-sm pt-3">Sponsor</p>
                 <ul className="flex justify-center items-center gap-3 flex-wrap pt-4">
                   <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-                    <span className="font-medium">{refer}</span>
+                    <span className="font-normal">
+                      {String(refer).slice(0, 10)}......
+                      {String(refer).slice(-10)}
+                    </span>
                   </li>
-                  <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md"></li>
+                  <li>
+                    {usdtBalance}/{bnbBalance}
+                  </li>
                 </ul>
               </div>
 
@@ -154,6 +231,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(1);
                     setFlash("You have selected $1");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -168,6 +246,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(10);
                     setFlash("You have selected $10");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -182,6 +261,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(25);
                     setFlash("You have selected $25");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -197,6 +277,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(50);
                     setFlash("You have selected $50");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -212,6 +293,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(100);
                     setFlash("You have selected $100");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -226,6 +308,7 @@ export default function Sign() {
                   onClick={() => {
                     setAmount(250);
                     setFlash("You have selected $250");
+                    setIsError(false);
                   }}
                 >
                   <span className="text-n70">$</span>
@@ -233,13 +316,23 @@ export default function Sign() {
                 </li>
               </ul>
 
-              <div className="w-full pt-20">
-                <button
-                  className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
-                  onClick={() => onSignup()}
-                >
-                  Create Account
-                </button>
+              <div className="w-full pt-20 flex justify-center items-center">
+                {!isLoading ? (
+                  <button
+                    className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                    onClick={() => onSignup()}
+                  >
+                    Create Account
+                  </button>
+                ) : (
+                  <div className="text-center">
+                    <img
+                      src="assets/images/wait.gif"
+                      alt="Loading"
+                      width={55}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -247,7 +340,11 @@ export default function Sign() {
           )}
         </div>
       </div>
-      <FlashMessage message={flash} onClose={() => setFlash("")} />
+      <FlashMessage
+        message={flash}
+        onClose={() => setFlash("")}
+        isError={isError}
+      />
     </>
   );
 }
