@@ -4,9 +4,10 @@ import useWalletStore from "../hooks/useWallet";
 export default function HomeComponent() {
   const api_link = process.env.REACT_APP_API_URL;
   const [spn, setSpn] = useState("");
-  const { address } = useWalletStore();
+  // const { address, fetchBalances } = useWalletStore();
+  const address = useWalletStore((state) => state.address);
+  const fetchBalances = useWalletStore((state) => state.fetchBalances);
   useEffect(() => {
-    console.log("In useEffect");
     async function getData() {
       try {
         let url = api_link + "getUser/" + address;
@@ -22,7 +23,40 @@ export default function HomeComponent() {
     }
     getData();
   }, [address]);
+  async function onWithdraw() {
+    if (!address) {
+      return;
+    }
+    const signUpurl = api_link + "withdrawUsdt";
+    const data = {
+      to: address,
+      amount: 1,
+    };
+    const customHeaders = {
+      "Content-Type": "application/json",
+    };
+    try {
+      const result = await fetch(signUpurl, {
+        method: "POST",
+        headers: customHeaders,
+        body: JSON.stringify(data),
+      });
 
+      if (!result.ok) {
+        throw new Error(`HTTP error! status: ${result.status}`);
+      }
+      const reData = await result.json();
+      console.log(reData.msg);
+      fetchBalances(address);
+      // const msg = reData.data[0].msg;
+      // if (msg === "success") {
+      //   console.log(reData.data[0].txHash);
+      // }
+      //console.log(reData);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <div className="homeTab pt-2 px-6">
@@ -160,7 +194,10 @@ export default function HomeComponent() {
               <p className="font-semibold">$150</p>
             </div>
           </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
+          <div
+            className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl"
+            onClick={() => onWithdraw()}
+          >
             <div className="flex justify-start items-center gap-2">
               <div className="text-g300 flex justify-center items-center size-10 rounded-full text-xl bg-white bg-opacity-5">
                 <img src="assets/images/check.png" alt="" />

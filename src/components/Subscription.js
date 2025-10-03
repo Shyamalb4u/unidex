@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FlashMessage from "./FlashMessage";
 import useWalletStore from "../hooks/useWallet";
 
@@ -9,9 +9,31 @@ export default function Subscription() {
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState(0);
   const [flash, setFlash] = useState("");
+  const [packageData, setPackageData] = useState([]);
 
-  const { address, usdtBalance, bnbBalance, sendUSDT, fetchBalances } =
-    useWalletStore();
+  const address = useWalletStore((state) => state.address);
+  const bnbBalance = useWalletStore((state) => state.bnbBalance);
+  const usdtBalance = useWalletStore((state) => state.usdtBalance);
+  const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  const sendUSDT = useWalletStore((state) => state.sendUSDT);
+
+  // const { address, usdtBalance, bnbBalance, sendUSDT, fetchBalances } =
+  //   useWalletStore();
+
+  useEffect(() => {
+    async function getPackages() {
+      try {
+        let url = api_link + "getMyPackages/" + address;
+        const result = await fetch(url);
+        const reData = await result.json();
+        setPackageData(reData.data);
+      } catch (e) {
+        console.log("Error!");
+        return;
+      }
+    }
+    getPackages();
+  }, [address]);
 
   async function onTopup() {
     setIsLoading(true);
@@ -211,106 +233,51 @@ export default function Subscription() {
           <p className="text-xl font-semibold">My Subscriptions</p>
         </div>
         <div className="flex flex-col gap-2 pt-5">
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#02</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$20</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#03</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$100</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
-          <div className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl">
-            <div className="flex justify-start items-center gap-2">
-              <p className="text-sm text-n70">#01</p>
-              <p className="font-semibold">25-09-2025</p>
-            </div>
-            <div className="flex flex-col justify-end items-end">
-              <p className="font-semibold">$10</p>
-              <p className="text-g300 text-sm">Txn. 0x45d4d</p>
-            </div>
-          </div>
+          {packageData ? (
+            <>
+              {packageData.map((data, index) => (
+                <div
+                  key={data.Activation_sl}
+                  className="flex justify-between items-center bg-white bg-opacity-5 p-4 rounded-xl"
+                >
+                  <div className="flex justify-start items-center gap-2">
+                    <p className="text-sm text-n70">#{index + 1}</p>
+                    <div className="flex flex-col justify-start ">
+                      <p className="font-semibold"> {data.DATES}</p>
+                      <p
+                        className={`${
+                          data.status === "Pending"
+                            ? "text-yellow"
+                            : data.status === "Success"
+                            ? "text-g300"
+                            : "text-red-400"
+                        } text-sm`}
+                      >
+                        {data.status}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-end items-end">
+                    <p className="font-semibold">$ {data.AMOUNT}</p>
+                    <p
+                      className={`${
+                        data.status === "Pending"
+                          ? "text-yellow"
+                          : data.status === "Success"
+                          ? "text-g300"
+                          : "text-red-400"
+                      } text-sm`}
+                    >
+                      Txn. {String(data.txn).slice(0, 12)}…
+                      <i className="ph ph-copy"></i>
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <p className="text-center">No Subscription Found</p>
+          )}
         </div>
       </div>
       <FlashMessage

@@ -17,15 +17,23 @@ export default function Sign() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState(0);
-  const {
-    connectWallet,
-    address,
-    isConnected,
-    usdtBalance,
-    bnbBalance,
-    sendUSDT,
-    fetchBalances,
-  } = useWalletStore();
+
+  const address = useWalletStore((state) => state.address);
+  const bnbBalance = useWalletStore((state) => state.bnbBalance);
+  const usdtBalance = useWalletStore((state) => state.usdtBalance);
+  const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  const isConnected = useWalletStore((state) => state.isConnected);
+  const connectWallet = useWalletStore((state) => state.connectWallet);
+  const sendUSDT = useWalletStore((state) => state.sendUSDT);
+  // const {
+  //   connectWallet,
+  //   address,
+  //   isConnected,
+  //   usdtBalance,
+  //   bnbBalance,
+  //   sendUSDT,
+  //   fetchBalances,
+  // } = useWalletStore();
 
   const [flash, setFlash] = useState("");
 

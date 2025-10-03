@@ -98,6 +98,7 @@ const useWalletStore = create((set, get) => ({
     if (!provider || !address) return;
 
     try {
+      console.log("Fetch Balance");
       // ✅ Get BNB balance
       const rpcProvider = new ethers.JsonRpcProvider(
         "https://bsc-dataseed.binance.org/"
@@ -111,6 +112,8 @@ const useWalletStore = create((set, get) => ({
       const decimals = await usdt.decimals();
       const usdtRaw = await usdt.balanceOf(address);
       const usdtBalance = ethers.formatUnits(usdtRaw, decimals);
+      console.log("Balance : ", bnbBalance);
+      console.log("USDT Balance : ", usdtBalance);
 
       set({ bnbBalance, usdtBalance });
     } catch (err) {

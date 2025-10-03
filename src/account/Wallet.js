@@ -11,15 +11,23 @@ export default function Wallet() {
   const api_link = process.env.REACT_APP_API_URL;
   const [page, setPage] = useState(0);
 
-  const {
-    address,
-    isConnected,
-    signer,
-    bnbBalance,
-    usdtBalance,
-    fetchBalances,
-    getTxStatus,
-  } = useWalletStore();
+  const address = useWalletStore((state) => state.address);
+  const bnbBalance = useWalletStore((state) => state.bnbBalance);
+  const usdtBalance = useWalletStore((state) => state.usdtBalance);
+  const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  const isConnected = useWalletStore((state) => state.isConnected);
+  const signer = useWalletStore((state) => state.signer);
+  const getTxStatus = useWalletStore((state) => state.getTxStatus);
+
+  // const {
+  //   address,
+  //   isConnected,
+  //   signer,
+  //   bnbBalance,
+  //   usdtBalance,
+  //   fetchBalances,
+  //   getTxStatus,
+  // } = useWalletStore();
   useEffect(() => {
     async function checkUser() {
       if (!isConnected) {
@@ -115,21 +123,27 @@ export default function Wallet() {
               </span>
             </div>
           </div>
-          <div className="py-4">
-            <p className="text-n70 text-sm">Your available balance</p>
-            <div className="flex justify-start items-center gap-2">
-              <img src="/assets/images/tet.png" alt="" />
-              <p className="text-[32px] font-bold text-white relative">
-                {usdtBalance}
-                <span className="text-sm font-normal text-g300 absolute top-1 -right-14">
-                  (USDT)
-                </span>
+          <div className="flex justify-between items-start">
+            <div className="py-4">
+              <p className="text-n70 text-sm">Your available balance</p>
+              <div className="flex justify-start items-center gap-2">
+                <img src="/assets/images/tet.png" alt="" />
+                <p className="text-[32px] font-bold text-white relative">
+                  {usdtBalance}
+                  <span className="text-sm font-normal text-g300 absolute top-1 -right-14">
+                    (USDT)
+                  </span>
+                </p>
+              </div>
+              <p className="text-sm text-n70">
+                <span className="text-g300"></span>
+                {bnbBalance} (BNB)
               </p>
             </div>
-            <p className="text-sm text-n70">
-              <span className="text-g300"></span>
-              {bnbBalance} (BNB)
-            </p>
+            <i
+              className="ph ph-arrows-counter-clockwise"
+              onClick={() => fetchBalances(address)}
+            ></i>
           </div>
         </div>
         {page === 0 ? (
