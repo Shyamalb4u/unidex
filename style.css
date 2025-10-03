@@ -1309,6 +1309,11 @@ video {
   color: rgba(45, 181, 47, 1);
   color: rgba(45, 181, 47, var(--tw-text-opacity));
 }
+.text-yellow {
+  --tw-text-opacity: 1;
+  color: rgb(245, 236, 3);
+  color: rgba(245, 236, 3, var(--tw-text-opacity));
+}
 .text-n70 {
   --tw-text-opacity: 1;
   color: rgba(169, 172, 175, 1);
