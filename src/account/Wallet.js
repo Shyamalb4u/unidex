@@ -27,6 +27,7 @@ export default function Wallet() {
     usdtBalance,
     fetchBalances,
     getTxStatus,
+    disconnectWallet,
   } = useWalletStore();
   useEffect(() => {
     async function checkUser() {
@@ -140,10 +141,18 @@ export default function Wallet() {
                 {bnbBalance} (BNB)
               </p>
             </div>
-            <i
-              className="ph ph-arrows-counter-clockwise"
-              onClick={() => fetchBalances(address)}
-            ></i>
+            <div>
+              <button
+                className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                onClick={disconnectWallet}
+              >
+                Disconnect
+              </button>
+              <i
+                className="ph ph-arrows-counter-clockwise"
+                onClick={() => fetchBalances(address)}
+              ></i>
+            </div>
           </div>
         </div>
         {page === 0 ? (

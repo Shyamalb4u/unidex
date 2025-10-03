@@ -68,11 +68,11 @@ const useWalletStore = create((set, get) => ({
       _provider = new BrowserProvider(wcProvider);
     }
 
-    console.log("Got All");
+    //console.log("Got All");
     const _signer = await _provider.getSigner();
     const _address = await _signer.getAddress();
 
-    console.log("Address:", _address);
+    //console.log("Address:", _address);
     set({
       provider: _provider,
       signer: _signer,
@@ -83,7 +83,17 @@ const useWalletStore = create((set, get) => ({
     await get().fetchBalances(_address);
   },
 
-  disconnectWallet: () =>
+  disconnectWallet: async () => {
+    const { provider } = get();
+
+    try {
+      // ✅ If provider is WalletConnect (or supports disconnect)
+      if (provider && provider.disconnect) {
+        await provider.disconnect();
+      }
+    } catch (err) {
+      console.error("Provider disconnect error:", err);
+    }
     set({
       provider: null,
       signer: null,
@@ -91,7 +101,8 @@ const useWalletStore = create((set, get) => ({
       isConnected: false,
       bnbBalance: "0",
       usdtBalance: "0",
-    }),
+    });
+  },
 
   fetchBalances: async (address) => {
     const { provider } = get();
