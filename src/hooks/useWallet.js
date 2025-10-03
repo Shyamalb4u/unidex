@@ -88,11 +88,13 @@ const useWalletStore = create((set, get) => ({
 
     try {
       // ✅ If provider is WalletConnect (or supports disconnect)
+      console.log("outside disconnect");
       if (provider && provider.disconnect) {
+        console.log("inside disconnect");
         await provider.disconnect();
       }
     } catch (err) {
-      console.error("Provider disconnect error:", err);
+      console.log("Provider disconnect error:", err);
     }
     set({
       provider: null,
