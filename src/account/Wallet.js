@@ -11,23 +11,23 @@ export default function Wallet() {
   const api_link = process.env.REACT_APP_API_URL;
   const [page, setPage] = useState(0);
 
-  const address = useWalletStore((state) => state.address);
-  const bnbBalance = useWalletStore((state) => state.bnbBalance);
-  const usdtBalance = useWalletStore((state) => state.usdtBalance);
-  const fetchBalances = useWalletStore((state) => state.fetchBalances);
-  const isConnected = useWalletStore((state) => state.isConnected);
-  const signer = useWalletStore((state) => state.signer);
-  const getTxStatus = useWalletStore((state) => state.getTxStatus);
+  // const address = useWalletStore((state) => state.address);
+  // const bnbBalance = useWalletStore((state) => state.bnbBalance);
+  // const usdtBalance = useWalletStore((state) => state.usdtBalance);
+  // const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  // const isConnected = useWalletStore((state) => state.isConnected);
+  // const signer = useWalletStore((state) => state.signer);
+  // const getTxStatus = useWalletStore((state) => state.getTxStatus);
 
-  // const {
-  //   address,
-  //   isConnected,
-  //   signer,
-  //   bnbBalance,
-  //   usdtBalance,
-  //   fetchBalances,
-  //   getTxStatus,
-  // } = useWalletStore();
+  const {
+    address,
+    isConnected,
+    signer,
+    bnbBalance,
+    usdtBalance,
+    fetchBalances,
+    getTxStatus,
+  } = useWalletStore();
   useEffect(() => {
     async function checkUser() {
       if (!isConnected) {

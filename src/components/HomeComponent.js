@@ -4,9 +4,10 @@ import useWalletStore from "../hooks/useWallet";
 export default function HomeComponent() {
   const api_link = process.env.REACT_APP_API_URL;
   const [spn, setSpn] = useState("");
-  // const { address, fetchBalances } = useWalletStore();
-  const address = useWalletStore((state) => state.address);
-  const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  const { address, fetchBalances } = useWalletStore();
+  // const address = useWalletStore((state) => state.address);
+  // const fetchBalances = useWalletStore((state) => state.fetchBalances);
+
   useEffect(() => {
     async function getData() {
       try {
@@ -57,6 +58,15 @@ export default function HomeComponent() {
       console.log(error);
     }
   }
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+
+      alert("Coppied");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
   return (
     <>
       <div className="homeTab pt-2 px-6">
@@ -161,7 +171,14 @@ export default function HomeComponent() {
             <p className="text-n70 pt-4 text-xs">
               https://unidex.world/sign?s={String(address).slice(0, 10)}
               .............
-              <i className="ph ph-copy"></i>
+              <i
+                className="ph ph-copy"
+                onClick={() =>
+                  copyToClipboard(
+                    "https://unidex.world/#/sign?s=" + String(address)
+                  )
+                }
+              ></i>
             </p>
           </div>
           <div className="">

@@ -11,14 +11,14 @@ export default function Subscription() {
   const [flash, setFlash] = useState("");
   const [packageData, setPackageData] = useState([]);
 
-  const address = useWalletStore((state) => state.address);
-  const bnbBalance = useWalletStore((state) => state.bnbBalance);
-  const usdtBalance = useWalletStore((state) => state.usdtBalance);
-  const fetchBalances = useWalletStore((state) => state.fetchBalances);
-  const sendUSDT = useWalletStore((state) => state.sendUSDT);
+  // const address = useWalletStore((state) => state.address);
+  // const bnbBalance = useWalletStore((state) => state.bnbBalance);
+  // const usdtBalance = useWalletStore((state) => state.usdtBalance);
+  // const fetchBalances = useWalletStore((state) => state.fetchBalances);
+  // const sendUSDT = useWalletStore((state) => state.sendUSDT);
 
-  // const { address, usdtBalance, bnbBalance, sendUSDT, fetchBalances } =
-  //   useWalletStore();
+  const { address, usdtBalance, bnbBalance, sendUSDT, fetchBalances } =
+    useWalletStore();
 
   useEffect(() => {
     async function getPackages() {
