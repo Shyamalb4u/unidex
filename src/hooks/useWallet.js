@@ -13,12 +13,14 @@ const useWalletStore = create((set, get) => ({
   provider: null,
   signer: null,
   address: null,
+  wcProvider: null,
   isConnected: false,
   bnbBalance: "0",
   usdtBalance: "0",
 
   connectWallet: async () => {
-    let _provider;
+    let _provider,
+      wcProvider = null;
     console.log("Connection Start");
 
     if (window.ethereum) {
@@ -59,7 +61,7 @@ const useWalletStore = create((set, get) => ({
     } else {
       // ✅ WalletConnect fallback
       console.log("Not window.ethereum, using WalletConnect");
-      const wcProvider = await EthereumProvider.init({
+      wcProvider = await EthereumProvider.init({
         projectId: "0afc422585c9b7c7ce9ef5418cb641fa", // replace
         chains: [56], // BSC Mainnet
         showQrModal: true,
@@ -76,6 +78,7 @@ const useWalletStore = create((set, get) => ({
     set({
       provider: _provider,
       signer: _signer,
+      wcProvider,
       address: _address,
       isConnected: true,
     });
@@ -84,22 +87,19 @@ const useWalletStore = create((set, get) => ({
   },
 
   disconnectWallet: async () => {
-    const { provider } = get();
-
+    const { wcProvider } = get();
     try {
-      // ✅ If provider is WalletConnect (or supports disconnect)
-      console.log("outside disconnect");
-      if (provider && provider.disconnect) {
-        console.log("inside disconnect");
-        await provider.disconnect();
+      if (wcProvider) {
+        await wcProvider.disconnect(); // 🔹 close Trust Wallet session
       }
     } catch (err) {
-      console.log("Provider disconnect error:", err);
+      console.error("WalletConnect disconnect error:", err);
     }
     set({
       provider: null,
       signer: null,
       address: null,
+      wcProvider: null,
       isConnected: false,
       bnbBalance: "0",
       usdtBalance: "0",
