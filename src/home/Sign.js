@@ -5,6 +5,16 @@ import FlashMessage from "../components/FlashMessage";
 
 export default function Sign() {
   const navigate = useNavigate();
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("trust")) {
+    console.log("Opened inside Trust Wallet");
+  } else if (ua.includes("metamask")) {
+    console.log("Opened inside MetaMask browser");
+  } else if (ua.includes("coinbase")) {
+    console.log("Opened inside Coinbase Wallet browser");
+  } else {
+    console.log("Probably a normal browser (Chrome, Safari, etc.)");
+  }
   //const newApi = process.env.REACT_APP_API_URL;
   //console.log(process.env.REACT_APP_API_URL);
   const api_link = process.env.REACT_APP_API_URL;

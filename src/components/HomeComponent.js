@@ -4,7 +4,7 @@ import useWalletStore from "../hooks/useWallet";
 export default function HomeComponent() {
   const api_link = process.env.REACT_APP_API_URL;
   const [spn, setSpn] = useState("");
-  const { address, fetchBalances } = useWalletStore();
+  const { address, fetchBalances, getTxStatus } = useWalletStore();
   // const address = useWalletStore((state) => state.address);
   // const fetchBalances = useWalletStore((state) => state.fetchBalances);
 
@@ -24,6 +24,76 @@ export default function HomeComponent() {
     }
     getData();
   }, [address]);
+  useEffect(() => {
+    async function getPendingData() {
+      try {
+        let url = api_link + "pending_activation/" + address;
+        console.log(url);
+        const result = await fetch(url);
+        const reData = await result.json();
+
+        if (reData.data !== "No Data") {
+          for (const pdata of reData.data) {
+            try {
+              const status = await getTxStatus(pdata.txn);
+
+              if (status === "success") {
+                console.log(pdata.txn);
+                //set activation status success and calculate income abd achievement
+                const buyUpurl = api_link + "booking";
+                const data = {
+                  txn: pdata.txn,
+                  type: "success",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              } else if (status === "failed") {
+                const buyUpurl = api_link + "booking";
+                const data = {
+                  txn: pdata.txn,
+                  type: "fail",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              }
+            } catch (e) {
+              console.log("Error!");
+            }
+          }
+        }
+      } catch (e) {
+        console.log("Error!");
+        return;
+      }
+    }
+    getPendingData();
+  }, [address, getTxStatus]);
   async function onWithdraw() {
     if (!address) {
       return;
@@ -157,33 +227,35 @@ export default function HomeComponent() {
       </div>
 
       <div className="px-6 pt-8">
-        <div className="w-full bg-g300 p-5 flex justify-between items-center rounded-xl relative bg-opacity-20 overflow-hidden">
-          <img
-            src="assets/images/invite_bg.png"
-            alt=""
-            className="absolute top-0 right-0 bottom-0 h-full"
-          />
-          <div className="max-w-[300px]">
-            <p className="text-xl font-semibold">
-              Invite a friends and get{" "}
-              <span className="text-g300">higher </span>income opportunities
-            </p>
-            <p className="text-n70 pt-4 text-xs">
-              https://unidex.world/sign?s={String(address).slice(0, 10)}
-              .............
-              <i
-                className="ph ph-copy"
-                onClick={() =>
-                  copyToClipboard(
-                    "https://unidex.world/#/sign?s=" + String(address)
-                  )
-                }
-              ></i>
-            </p>
+        <div className="w-full bg-g300 p-5 rounded-xl relative bg-opacity-20 overflow-hidden">
+          <div className="flex justify-between items-center">
+            <img
+              src="assets/images/invite_bg.png"
+              alt=""
+              className="absolute top-0 right-0 bottom-0 h-full"
+            />
+            <div className="max-w-[300px]">
+              <p className="text-xl font-semibold">
+                Invite a friends and get{" "}
+                <span className="text-g300">higher </span>income opportunities
+              </p>
+            </div>
+            <div className="">
+              <img src="/refer.png" alt="" width={150} />
+            </div>
           </div>
-          <div className="">
-            <img src="/refer.png" alt="" width={150} />
-          </div>
+          <p className="text-n70 pt-1 text-xs">
+            https://unidex.world/sign?s={String(address).slice(0, 10)}
+            .............
+            <i
+              className="ph ph-copy"
+              onClick={() =>
+                copyToClipboard(
+                  "https://unidex.world/#/sign?s=" + String(address)
+                )
+              }
+            ></i>
+          </p>
         </div>
       </div>
 

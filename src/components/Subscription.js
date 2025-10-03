@@ -20,20 +20,20 @@ export default function Subscription() {
   const { address, usdtBalance, bnbBalance, sendUSDT, fetchBalances } =
     useWalletStore();
 
-  useEffect(() => {
-    async function getPackages() {
-      try {
-        let url = api_link + "getMyPackages/" + address;
-        const result = await fetch(url);
-        const reData = await result.json();
-        setPackageData(reData.data);
-      } catch (e) {
-        console.log("Error!");
-        return;
-      }
+  async function getPackages() {
+    try {
+      let url = api_link + "getMyPackages/" + address;
+      const result = await fetch(url);
+      const reData = await result.json();
+      setPackageData(reData.data);
+    } catch (e) {
+      console.log("Error!");
+      return;
     }
+  }
+  useEffect(() => {
     getPackages();
-  }, [address]);
+  }, [getPackages]);
 
   async function onTopup() {
     setIsLoading(true);
@@ -101,6 +101,7 @@ export default function Subscription() {
       if (uid === "OK") {
         setIsLoading(false);
         fetchBalances(address);
+        getPackages();
         setAmount(0);
         setFlash("Subcription Successful");
         setIsError(false);
