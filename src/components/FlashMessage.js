@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export default function FlashMessage({
   message,
-  duration = 3000,
+  duration = 2000,
   onClose,
   isError,
 }) {

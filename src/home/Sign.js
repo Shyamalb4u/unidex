@@ -233,10 +233,15 @@ export default function Sign() {
                       {String(refer).slice(-10)}
                     </span>
                   </li>
-                  <li>
-                    {usdtBalance}/{bnbBalance}
-                  </li>
                 </ul>
+                USDT {usdtBalance} | BNB {bnbBalance}{" "}
+                <i
+                  className="ph ph-arrows-counter-clockwise"
+                  style={{ fontSize: "24px", cursor: "pointer" }}
+                  onClick={() => {
+                    fetchBalances(address);
+                  }}
+                ></i>
               </div>
 
               <ul className="flex flex-wrap gap-3 pt-4">

@@ -1034,6 +1034,11 @@ video {
 .border-opacity-5 {
   --tw-border-opacity: 0.05;
 }
+.bg-withdraw {
+  --tw-bg-opacity: 1;
+  background-color: rgba(213, 86, 2, 1);
+  background-color: rgba(213, 86, 2, var(--tw-bg-opacity));
+}
 .bg-g300 {
   --tw-bg-opacity: 1;
   background-color: rgba(45, 181, 47, 1);

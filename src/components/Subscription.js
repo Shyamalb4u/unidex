@@ -277,7 +277,13 @@ export default function Subscription() {
               ))}
             </>
           ) : (
-            <p className="text-center">No Subscription Found</p>
+            <>
+              {" "}
+              <p className="text-center">No Subscription Found</p>
+              <div className="flex justify-center items-center">
+                <img src="assets/no-data.png" alt="" width={220} />{" "}
+              </div>
+            </>
           )}
         </div>
       </div>
