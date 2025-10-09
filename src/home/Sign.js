@@ -5,16 +5,8 @@ import FlashMessage from "../components/FlashMessage";
 
 export default function Sign() {
   const navigate = useNavigate();
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("trust")) {
-    console.log("Opened inside Trust Wallet");
-  } else if (ua.includes("metamask")) {
-    console.log("Opened inside MetaMask browser");
-  } else if (ua.includes("coinbase")) {
-    console.log("Opened inside Coinbase Wallet browser");
-  } else {
-    console.log("Probably a normal browser (Chrome, Safari, etc.)");
-  }
+  const [isWallet, setIsWallet] = useState(true);
+
   //const newApi = process.env.REACT_APP_API_URL;
   //console.log(process.env.REACT_APP_API_URL);
   const api_link = process.env.REACT_APP_API_URL;
@@ -26,6 +18,7 @@ export default function Sign() {
   const [showRegi, setShowRegi] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const [amount, setAmount] = useState(0);
 
   // const address = useWalletStore((state) => state.address);
@@ -50,6 +43,19 @@ export default function Sign() {
   // const showMessage = () => {
   //   setFlash("Wallet connected successfully!");
   // };
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.includes("trust")) {
+      console.log("Opened inside Trust Wallet");
+    } else if (ua.includes("metamask")) {
+      console.log("Opened inside MetaMask browser");
+    } else if (ua.includes("coinbase")) {
+      console.log("Opened inside Coinbase Wallet browser");
+    } else {
+      setIsWallet(() => false);
+      console.log("Probably a normal browser (Chrome, Safari, etc.)");
+    }
+  }, []);
 
   useEffect(() => {
     setRefer(spn);
@@ -196,17 +202,22 @@ export default function Sign() {
             >
               <i className="ph-bold ph-caret-left"></i>
             </Link>
-            {isConnected ? (
-              <span className="text-n70 text-sm">
-                {String(address).slice(0, 10)}......{String(address).slice(-10)}
-              </span>
+            {isWallet ? (
+              isConnected ? (
+                <span className="text-n70 text-sm">
+                  {String(address).slice(0, 10)}......
+                  {String(address).slice(-10)}
+                </span>
+              ) : (
+                <button
+                  className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                  onClick={connectWallet}
+                >
+                  Connect Wallet
+                </button>
+              )
             ) : (
-              <button
-                className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
-                onClick={connectWallet}
-              >
-                Connect Wallet
-              </button>
+              "Open In Wallet Browser"
             )}
 
             {/* <div className="flex justify-start items-center">
@@ -222,144 +233,157 @@ export default function Sign() {
           </div>
 
           <div className="border border-white border-opacity-5 border-dashed w-full mt-8"></div>
-          {showRegi ? (
-            <div>
-              <div className="mt-6 p-4 bg-white bg-opacity-5 rounded-xl flex flex-col justify-center items-center text-center">
-                <p className="text-n70 text-sm pt-3">Sponsor</p>
-                <ul className="flex justify-center items-center gap-3 flex-wrap pt-4">
-                  <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
-                    <span className="font-normal">
-                      {String(refer).slice(0, 10)}......
-                      {String(refer).slice(-10)}
-                    </span>
+          {isWallet ? (
+            showRegi ? (
+              <div>
+                <div className="mt-6 p-4 bg-white bg-opacity-5 rounded-xl flex flex-col justify-center items-center text-center">
+                  <p className="text-n70 text-sm pt-3">Sponsor</p>
+                  <ul className="flex justify-center items-center gap-3 flex-wrap pt-4">
+                    <li className="bg-white bg-opacity-5 py-2 px-4 rounded-md">
+                      <span className="font-normal">
+                        {String(refer).slice(0, 10)}......
+                        {String(refer).slice(-10)}
+                      </span>
+                    </li>
+                  </ul>
+                  USDT {usdtBalance} | BNB {bnbBalance}{" "}
+                  <i
+                    className="ph ph-arrows-counter-clockwise"
+                    style={{ fontSize: "24px", cursor: "pointer" }}
+                    onClick={() => {
+                      fetchBalances(address);
+                    }}
+                  ></i>
+                </div>
+
+                <ul className="flex flex-wrap gap-3 pt-4">
+                  <li
+                    className={`${
+                      amount === 1
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(1);
+                      setFlash("You have selected $1");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">1</span>
+                  </li>
+                  <li
+                    className={`${
+                      amount === 10
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(10);
+                      setFlash("You have selected $10");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">10</span>
+                  </li>
+                  <li
+                    className={`${
+                      amount === 25
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(25);
+                      setFlash("You have selected $25");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">25</span>
+                  </li>
+
+                  <li
+                    className={`${
+                      amount === 50
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(50);
+                      setFlash("You have selected $50");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">50</span>
+                  </li>
+
+                  <li
+                    className={`${
+                      amount === 100
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(100);
+                      setFlash("You have selected $100");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">100</span>
+                  </li>
+                  <li
+                    className={`${
+                      amount === 250
+                        ? "bg-g300 bg-opacity-4"
+                        : "bg-white bg-opacity-5"
+                    } py-2 px-4 rounded-md`}
+                    onClick={() => {
+                      setAmount(250);
+                      setFlash("You have selected $250");
+                      setIsError(false);
+                    }}
+                  >
+                    <span className="text-n70">$</span>
+                    <span className="font-medium">250</span>
                   </li>
                 </ul>
-                USDT {usdtBalance} | BNB {bnbBalance}{" "}
-                <i
-                  className="ph ph-arrows-counter-clockwise"
-                  style={{ fontSize: "24px", cursor: "pointer" }}
-                  onClick={() => {
-                    fetchBalances(address);
-                  }}
-                ></i>
+
+                <div className="w-full pt-20 flex justify-center items-center">
+                  {!isLoading ? (
+                    <button
+                      className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
+                      onClick={() => onSignup()}
+                    >
+                      Create Account
+                    </button>
+                  ) : (
+                    <div className="text-center">
+                      <img
+                        src="assets/images/wait.gif"
+                        alt="Loading"
+                        width={55}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <ul className="flex flex-wrap gap-3 pt-4">
-                <li
-                  className={`${
-                    amount === 1
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(1);
-                    setFlash("You have selected $1");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">1</span>
-                </li>
-                <li
-                  className={`${
-                    amount === 10
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(10);
-                    setFlash("You have selected $10");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">10</span>
-                </li>
-                <li
-                  className={`${
-                    amount === 25
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(25);
-                    setFlash("You have selected $25");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">25</span>
-                </li>
-
-                <li
-                  className={`${
-                    amount === 50
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(50);
-                    setFlash("You have selected $50");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">50</span>
-                </li>
-
-                <li
-                  className={`${
-                    amount === 100
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(100);
-                    setFlash("You have selected $100");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">100</span>
-                </li>
-                <li
-                  className={`${
-                    amount === 250
-                      ? "bg-g300 bg-opacity-4"
-                      : "bg-white bg-opacity-5"
-                  } py-2 px-4 rounded-md`}
-                  onClick={() => {
-                    setAmount(250);
-                    setFlash("You have selected $250");
-                    setIsError(false);
-                  }}
-                >
-                  <span className="text-n70">$</span>
-                  <span className="font-medium">250</span>
-                </li>
-              </ul>
-
-              <div className="w-full pt-20 flex justify-center items-center">
-                {!isLoading ? (
-                  <button
-                    className="block bg-g300 font-semibold text-center py-3 rounded-lg openAgreeModal w-full"
-                    onClick={() => onSignup()}
-                  >
-                    Create Account
-                  </button>
-                ) : (
-                  <div className="text-center">
-                    <img
-                      src="assets/images/wait.gif"
-                      alt="Loading"
-                      width={55}
-                    />
-                  </div>
-                )}
+            ) : (
+              <div className="flex justify-center items-center">
+                <img
+                  src="/connect.png"
+                  alt="Connect"
+                  onClick={connectWallet}
+                  style={{ width: 250 }}
+                />
               </div>
-            </div>
+            )
           ) : (
-            <img src="/connect.png" alt="Connect" onClick={connectWallet} />
+            <div className="flex justify-center items-center">
+              Open In A Wallet Browser
+            </div>
           )}
         </div>
       </div>
