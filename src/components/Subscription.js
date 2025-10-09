@@ -120,7 +120,7 @@ export default function Subscription() {
   return (
     <>
       <ul className="flex flex-wrap gap-3 pt-4 pb-3">
-        <li
+        {/* <li
           className={`${
             amount === 1 ? "bg-g300 bg-opacity-4" : "bg-white bg-opacity-5"
           } py-2 px-4 rounded-md`}
@@ -132,7 +132,7 @@ export default function Subscription() {
         >
           <span className="text-n70">$</span>
           <span className="font-medium">1</span>
-        </li>
+        </li> */}
         <li
           className={`${
             amount === 10 ? "bg-g300 bg-opacity-4" : "bg-white bg-opacity-5"

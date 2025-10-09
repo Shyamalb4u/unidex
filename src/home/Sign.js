@@ -279,7 +279,7 @@ export default function Sign() {
                 </div>
 
                 <ul className="flex flex-wrap gap-3 pt-4">
-                  <li
+                  {/* <li
                     className={`${
                       amount === 1
                         ? "bg-g300 bg-opacity-4"
@@ -293,7 +293,7 @@ export default function Sign() {
                   >
                     <span className="text-n70">$</span>
                     <span className="font-medium">1</span>
-                  </li>
+                  </li> */}
                   <li
                     className={`${
                       amount === 10
