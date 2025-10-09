@@ -44,16 +44,38 @@ export default function Sign() {
   //   setFlash("Wallet connected successfully!");
   // };
   useEffect(() => {
-    const ua = navigator.userAgent.toLowerCase();
-    if (ua.includes("trust")) {
-      console.log("Opened inside Trust Wallet");
-    } else if (ua.includes("metamask")) {
-      console.log("Opened inside MetaMask browser");
-    } else if (ua.includes("coinbase")) {
-      console.log("Opened inside Coinbase Wallet browser");
+    // const ua = navigator.userAgent.toLowerCase();
+    // if (ua.includes("trust")) {
+    //   setIsWallet(() => true);
+    //   console.log("Opened inside Trust Wallet");
+    // } else if (ua.includes("metamask")) {
+    //   setIsWallet(() => true);
+    //   console.log("Opened inside MetaMask browser");
+    // } else if (ua.includes("coinbase")) {
+    //   setIsWallet(() => true);
+    //   console.log("Opened inside Coinbase Wallet browser");
+    // } else {
+    //   setIsWallet(() => false);
+    //   console.log("Probably a normal browser (Chrome, Safari, etc.)");
+    // }
+    const eth = window.ethereum;
+    if (eth) {
+      if (eth.isTrust) {
+        console.log("✅ Opened inside Trust Wallet");
+        setIsWallet(true);
+      } else if (eth.isMetaMask) {
+        console.log("✅ Opened inside MetaMask browser");
+        setIsWallet(true);
+      } else if (eth.isCoinbaseWallet) {
+        console.log("✅ Opened inside Coinbase Wallet browser");
+        setIsWallet(true);
+      } else {
+        console.log("✅ Wallet provider found, unknown type");
+        setIsWallet(true);
+      }
     } else {
-      setIsWallet(() => false);
-      console.log("Probably a normal browser (Chrome, Safari, etc.)");
+      console.log("🌐 Probably a normal browser (Chrome, Safari, etc.)");
+      setIsWallet(false);
     }
   }, []);
 
