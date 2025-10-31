@@ -18,6 +18,7 @@ export default function HomeComponent() {
   // const fetchBalances = useWalletStore((state) => state.fetchBalances);
   async function getWithdrawals() {
     try {
+      // getPendingWithdrawal();
       let url = api_link + "getIncomeStatement/" + address + "/Withdrawal";
       const result = await fetch(url);
       const reData = await result.json();
@@ -27,6 +28,7 @@ export default function HomeComponent() {
       return;
     }
   }
+
   useEffect(() => {
     async function getData() {
       try {
@@ -41,8 +43,74 @@ export default function HomeComponent() {
         console.log("Error");
       }
     }
+    async function getPendingWithdrawal() {
+      try {
+        let url = api_link + "pending_withdraw/" + address;
+        const result = await fetch(url);
+        const reData = await result.json();
+
+        if (reData.data !== "No Data") {
+          for (const pdata of reData.data) {
+            try {
+              const status = await getTxStatus(pdata.TXN);
+
+              if (status === "success") {
+                //set activation status success and calculate income abd achievement
+                const buyUpurl = api_link + "withdrawalCheck";
+                const data = {
+                  txn: pdata.TXN,
+                  type: "success",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              } else if (status === "failed") {
+                const buyUpurl = api_link + "withdrawalCheck";
+                const data = {
+                  txn: pdata.TXN,
+                  type: "fail",
+                };
+                const customHeaders = {
+                  "Content-Type": "application/json",
+                };
+                try {
+                  const result = await fetch(buyUpurl, {
+                    method: "POST",
+                    headers: customHeaders,
+                    body: JSON.stringify(data),
+                  });
+                  if (!result.ok) {
+                    throw new Error(`HTTP error! status: ${result.status}`);
+                  }
+                } catch (error) {
+                  console.log("Error!");
+                }
+              }
+            } catch (e) {
+              console.log("Error!");
+            }
+          }
+        }
+      } catch (e) {
+        console.log("Error!");
+        return;
+      }
+    }
     getData();
-  }, [address]);
+    getPendingWithdrawal();
+  }, [address, api_link]);
 
   useEffect(() => {
     fetchIncomeData(address);
@@ -116,7 +184,7 @@ export default function HomeComponent() {
       }
     }
     getPendingData();
-  }, [address, getTxStatus]);
+  }, [address, getTxStatus, api_link]);
   async function onWithdraw() {
     if (!address) {
       return;
@@ -127,71 +195,99 @@ export default function HomeComponent() {
     if (parseFloat(balance) > 0) {
       const admCh = (balance * 10) / 100;
       const net = balance - admCh;
-      console.log(admCh, net);
-      const signUpurl = api_link + "withdrawUsdt";
-      const data = {
-        to: address,
-        amount: net,
+      //console.log(admCh, net);
+      //// First Insert into Database
+      const withdrawalUrl = api_link + "withdrawal";
+      const dataToSend = {
+        publicKey: address,
+        amount: balance,
+        txn: "Pending Txn",
       };
-      const customHeaders = {
+      const customHeadersTo = {
         "Content-Type": "application/json",
       };
       try {
-        const result = await fetch(signUpurl, {
+        const result = await fetch(withdrawalUrl, {
           method: "POST",
-          headers: customHeaders,
-          body: JSON.stringify(data),
+          headers: customHeadersTo,
+          body: JSON.stringify(dataToSend),
         });
 
         if (!result.ok) {
+          setIsLoading(false);
+          setFlash("Withdrawal Failed!");
+          setIsError(true);
           throw new Error(`HTTP error! status: ${result.status}`);
         }
         const reData = await result.json();
-        console.log(reData.msg);
-        const msg = reData.msg;
-        if (msg === "success") {
-          const txHash = reData.txHash;
-          ///////// Database
-          const withdrawalUrl = api_link + "withdrawal";
-          const data = {
-            publicKey: address,
-            amount: balance,
-            txn: txHash,
-          };
-          const customHeaders = {
-            "Content-Type": "application/json",
-          };
-          try {
-            const result = await fetch(withdrawalUrl, {
-              method: "POST",
-              headers: customHeaders,
-              body: JSON.stringify(data),
-            });
+        const withSl = reData.data[0].withSl;
+        /////// Send Real USDT
+        const signUpurl = api_link + "withdrawUsdt";
+        const data = {
+          to: address,
+          amount: net,
+        };
+        const customHeaders = {
+          "Content-Type": "application/json",
+        };
+        try {
+          const resultGet = await fetch(signUpurl, {
+            method: "POST",
+            headers: customHeaders,
+            body: JSON.stringify(data),
+          });
 
-            if (!result.ok) {
+          if (!resultGet.ok) {
+            throw new Error(`HTTP error! status: ${resultGet.status}`);
+          }
+          const reData = await resultGet.json();
+          console.log(reData.msg);
+          const msg = reData.msg;
+          if (msg === "success") {
+            const txHash = reData.txHash;
+            ///////// Database
+            const updateUrl = api_link + "withdrawal_update";
+            const updateData = {
+              withSl: withSl,
+              txn: txHash,
+            };
+            const updateHeaders = {
+              "Content-Type": "application/json",
+            };
+            try {
+              const updatResult = await fetch(updateUrl, {
+                method: "POST",
+                headers: updateHeaders,
+                body: JSON.stringify(updateData),
+              });
+              if (!updatResult.ok) {
+                throw new Error(`HTTP error! status: ${updatResult.status}`);
+              }
+              const reDatass = await updatResult.json();
+            } catch (err) {
+              console.log(err);
               setIsLoading(false);
               setFlash("Withdrawal Failed!");
               setIsError(true);
-              throw new Error(`HTTP error! status: ${result.status}`);
             }
-            const reData = await result.json();
-          } catch (error) {
-            console.log("Others Error!");
-            setIsLoading(false);
+            //// End Database
           }
-          //// End Database
+          fetchIncomeData(address);
+          fetchBalances(address);
+          setIsLoading(false);
+          setFlash("Withdrawal Success");
+          setIsError(false);
+        } catch (error) {
+          console.log(error);
+          setIsLoading(false);
+          setFlash("Withdrawal Failed!");
+          setIsError(true);
         }
-        fetchIncomeData(address);
-        fetchBalances(address);
-        setIsLoading(false);
-        setFlash("Withdrawal Success");
-        setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.log("Others Error!");
         setIsLoading(false);
-        setFlash("Withdrawal Failed!");
-        setIsError(true);
       }
+      ///////// End Of Database
     } else {
       setIsLoading(false);
       setFlash("Low Balance");
@@ -432,6 +528,22 @@ export default function HomeComponent() {
                           <p className="font-semibold">{data.dates} </p>
                           <p className="text-n70 text-xs">
                             Ch. -{data.ADMIN_CH}{" "}
+                          </p>
+                          <p
+                            className={`text-xs ${
+                              data.STATUS === "Pending"
+                                ? "text-yellow"
+                                : data.STATUS === "Success"
+                                ? "text-g300"
+                                : "text-red-400"
+                            }`}
+                          >
+                            {data.STATUS}{" "}
+                            {/* <i
+                              className="ph ph-arrows-counter-clockwise"
+                              style={{ fontSize: "12px", cursor: "pointer" }}
+                              onClick={() => null}
+                            ></i> */}
                           </p>
                         </div>
                       </div>

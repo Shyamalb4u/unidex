@@ -105,7 +105,7 @@ export default function Sign() {
       }
     }
     checkUser();
-  }, [address, isConnected, navigate]);
+  }, [address, isConnected, navigate, api_link]);
 
   async function onSignup() {
     setIsLoading(true);
