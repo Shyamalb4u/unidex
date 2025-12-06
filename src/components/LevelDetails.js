@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import useWalletStore from "../hooks/useWallet";
-import LevelDetails from "./LevelDetails";
-import TreeView from "./TreeView";
-
-export default function Network() {
+export default function LevelDetails() {
   const api_link = process.env.REACT_APP_API_URL;
   const [statementData, setStatementData] = useState([]);
-  const [page, setPage] = useState(0);
   const { address } = useWalletStore();
   useEffect(() => {
     async function getPackages() {
@@ -24,26 +20,10 @@ export default function Network() {
   }, [address]);
   return (
     <div className="px-6 pt-8">
-      <div className="flex justify-between items-center">
-        <button
-          className={`block ${
-            page === 0 ? "bg-g300" : "bg-g500"
-          } font-semibold text-center py-3 px-3 rounded-lg openAgreeModal w-full`}
-          onClick={() => setPage(0)}
-        >
-          Community
-        </button>
-        <button
-          className={`block ${
-            page === 1 ? "bg-g300" : "bg-g500"
-          } font-semibold text-center py-3 px-3 rounded-lg openAgreeModal w-full`}
-          onClick={() => setPage(1)}
-        >
-          Tree View
-        </button>
+      <div className="text-center">
+        <p className="text-xl font-semibold">Community</p>
       </div>
-      {page === 0 ? <LevelDetails /> : <TreeView />}
-      {/* <div className="flex flex-col gap-2 pt-5">
+      <div className="flex flex-col gap-2 pt-5">
         {statementData.length > 0 ? (
           <>
             {statementData.map((data, index) => (
@@ -68,7 +48,7 @@ export default function Network() {
         ) : (
           ""
         )}
-      </div> */}
+      </div>
     </div>
   );
 }
