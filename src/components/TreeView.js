@@ -50,6 +50,9 @@ export default function TreeView() {
                     </p>
                   </div>
                   <div className="flex flex-col justify-end items-end">
+                    <p className="font-semibold">T:{data.cnt}</p>
+                  </div>
+                  <div className="flex flex-col justify-end items-end">
                     <p className="font-semibold">${data.busi}</p>
                   </div>
                 </div>
